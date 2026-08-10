@@ -1,0 +1,62 @@
+generator client {
+  provider        = "prisma-client-js"
+  output          = "../src/generated/prisma"
+  previewFeatures = ["partialIndexes"]
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model mesas {
+  id            Int             @id @default(autoincrement())
+  numero        Int             @unique
+  capacidad     Int
+  ubicacion     String?         @db.VarChar(100)
+  activa        Boolean         @default(true)
+  creado_en     DateTime        @default(now()) @db.Timestamp(6)
+  reservaciones reservaciones[]
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model reservaciones {
+  id             Int                @id @default(autoincrement())
+  usuario_id     Int
+  mesa_id        Int
+  fecha          DateTime           @db.Date
+  hora           DateTime           @db.Time(6)
+  num_comensales Int
+  estado         estado_reservacion @default(pendiente)
+  creado_en      DateTime           @default(now()) @db.Timestamp(6)
+  mesas          mesas              @relation(fields: [mesa_id], references: [id], onUpdate: NoAction)
+  usuarios       usuarios           @relation(fields: [usuario_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@unique([mesa_id, fecha, hora], map: "idx_mesa_fecha_hora_activa", where: raw("(estado <> 'cancelada'::estado_reservacion)"))
+  @@index([estado], map: "idx_reservaciones_estado")
+  @@index([usuario_id], map: "idx_reservaciones_usuario")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model usuarios {
+  id            Int             @id @default(autoincrement())
+  nombre        String          @db.VarChar(100)
+  email         String          @unique @db.VarChar(150)
+  password_hash String          @db.VarChar(255)
+  rol           rol_usuario     @default(cliente)
+  creado_en     DateTime        @default(now()) @db.Timestamp(6)
+  reservaciones reservaciones[]
+}
+
+enum estado_reservacion {
+  pendiente
+  confirmada
+  cancelada
+  completada
+}
+
+enum rol_usuario {
+  cliente
+  admin
+}
