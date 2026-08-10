@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { crearReservacion, obtenerReservaciones, obtenerMisReservaciones } from '../controllers/reservaciones.controller.js';
+import { crearReservacion, obtenerReservaciones, obtenerMisReservaciones, actualizarEstadoReservacion, cancelarReservacion } from '../controllers/reservaciones.controller.js';
 import { verificarToken } from '../middlewares/auth.middleware.js';
 import { verificarRol } from '../middlewares/rol.middleware.js';
 
@@ -78,7 +78,64 @@ router.get('/mis', obtenerMisReservaciones);
 // GET /api/reservaciones -> comportamiento por rol
 router.get('/', verificarRol('admin'), obtenerReservaciones);
 
+/**
+ * @swagger
+ * /api/reservaciones/{id}/estado:
+ *   put:
+ *     summary: Cambia el estado de una reservación (Solo Admin)
+ *     tags: [Reservaciones]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: ID de la reservación
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               estado:
+ *                 type: string
+ *                 enum: [pendiente, confirmada, cancelada, completada]
+ *                 example: "confirmada"
+ *     responses:
+ *       200:
+ *         description: Estado actualizado correctamente
+ *       404:
+ *         description: Reservación no encontrada
+ */
+router.put('/:id/estado', verificarRol('admin'), actualizarEstadoReservacion);
 
+/**
+ * @swagger
+ * /api/reservaciones/{id}:
+ *   delete:
+ *     summary: Cancela una reservación propia (Cliente)
+ *     tags: [Reservaciones]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: ID de la reservación a cancelar
+ *     responses:
+ *       200:
+ *         description: Reservación cancelada exitosamente
+ *       403:
+ *         description: Acceso denegado (No es tu reservación)
+ *       404:
+ *         description: Reservación no encontrada
+ */
+router.delete('/:id', cancelarReservacion);
 
 
 export default router;
