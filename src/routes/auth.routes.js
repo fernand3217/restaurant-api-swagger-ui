@@ -5,6 +5,7 @@ import { verificarRol } from '../middlewares/rol.middleware.js';
 
 const router = Router();
 
+
 /**
  * @swagger
  * /api/auth/registro:
@@ -77,8 +78,7 @@ router.post('/login', loginUsuario);
  *         description: No se proporcionó un token
  */
 // Creamos una ruta para obtener datos del usuario
-// ponemos verificarToken y la función 
-router.get('/perfil', verificarToken, (req, res) => {
+router.get('/perfil', verificarToken, verificarRol('cliente'), (req, res) => {
     // el middleware inyectó req.usuario, podemos usarlo aquí
     res.json({
         mensaje: '¡Bienvenido a tu perfil protegido!',

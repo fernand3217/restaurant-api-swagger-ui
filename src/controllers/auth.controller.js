@@ -59,20 +59,20 @@ export const loginUsuario = async (req, res) => {
             return res.status(401).json({ error: 'Credenciales inválidas' });
         }
 
-        // 2. Comparamos la contraseña en texto plano con el hash guardado en la base de datos
+        // Comparamos la contraseña en texto plano con el hash guardado 
         const passwordValido = await bcrypt.compare(password, usuario.password_hash);
 
         if (!passwordValido) {
             return res.status(401).json({ error: 'Credenciales inválidas' });
         }
 
-        // 3. Si todo es correcto, creamos el "Payload" (la información pública que llevará la pulsera)
+        // Si todo es correcto creamos el "Payload"
         const payload = {
             id: usuario.id,
             rol: usuario.rol
         };
 
-        // 4. Generamos el Token firmándolo con nuestra llave secreta
+        // Generamos el Token firmándolo con nuestra llave secreta
         // Le damos un tiempo de expiración (ej. 2 horas) por seguridad
         const token = jwt.sign(payload, process.env.JWT_SECRET, {
             expiresIn: '2h'

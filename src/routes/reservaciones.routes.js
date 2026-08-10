@@ -1,26 +1,13 @@
 import { Router } from 'express';
 import { crearReservacion, obtenerReservaciones, obtenerMisReservaciones } from '../controllers/reservaciones.controller.js';
 import { verificarToken } from '../middlewares/auth.middleware.js';
+import { verificarRol } from '../middlewares/rol.middleware.js';
 
 const router = Router();
 
 // Todas reservaciones requieren autenticado
 router.use(verificarToken);
-/**
- * @swagger
- * /api/reservaciones:
- *   get:
- *     summary: Obtiene las reservaciones
- *     description: Si es cliente, obtiene sus reservaciones. Si es admin, obtiene todas.
- *     tags: [Reservaciones]
- *     security:
- *       - bearerAuth: []
- *     responses:
- *       200:
- *         description: Lista de reservaciones devuelta con éxito
- */
-// GET /api/reservaciones -> comportamiento por rol
-router.get('/', obtenerReservaciones);
+
 /**
  * @swagger
  * /api/reservaciones:
@@ -57,7 +44,7 @@ router.get('/', obtenerReservaciones);
  *         description: La mesa solicitada no existe
  */
 // POST /api/reservaciones -> Crear una reservación clientes y admin
-router.post('/', crearReservacion);
+router.post('/', verificarRol('cliente'), crearReservacion);
 
 /**
  * @swagger
@@ -74,6 +61,24 @@ router.post('/', crearReservacion);
 // 2. Conectamos la ruta. Usamos verificarRol si quieres restringirlo solo a clientes, 
 // o lo dejamos abierto para que un admin también pueda ver sus propias reservas.
 router.get('/mis', obtenerMisReservaciones);
+
+/**
+ * @swagger
+ * /api/reservaciones:
+ *   get:
+ *     summary: Obtiene las reservaciones
+ *     description: Si es cliente, obtiene sus reservaciones. Si es admin, obtiene todas.
+ *     tags: [Reservaciones]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Lista de reservaciones devuelta con éxito
+ */
+// GET /api/reservaciones -> comportamiento por rol
+router.get('/', verificarRol('admin'), obtenerReservaciones);
+
+
 
 
 export default router;

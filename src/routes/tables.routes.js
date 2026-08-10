@@ -67,7 +67,7 @@ router.get('/:id', getTable);
  *         description: Acceso denegado (Rol incorrecto)
  */
 // POST /api/mesas
-router.post('/', createTable);
+router.post('/', verificarRol('admin'), createTable);
 
 /**
  * @swagger
