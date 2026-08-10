@@ -95,3 +95,26 @@ export const obtenerReservaciones = async (req, res) => {
         res.status(500).json({ error: 'Error interno del servidor' });
     }
 };
+
+export const obtenerMisReservaciones = async (req, res) => {
+
+    const usuario_id = req.usuario.id;
+
+    try {
+        const misReservaciones = await prisma.reservaciones.findMany({
+            where: { usuario_id: usuario_id },
+            include: {
+                mesas: true
+            },
+            orderBy: [
+                { fecha: 'asc' },
+                { hora: 'asc' }
+            ]
+        });
+
+        res.json(misReservaciones);
+    } catch (error) {
+        console.error('Error al obtener mis reservaciones:', error);
+        res.status(500).json({ error: 'Error al obtener las reservaciones' });
+    }
+};

@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { crearReservacion, obtenerReservaciones } from '../controllers/reservaciones.controller.js';
+import { crearReservacion, obtenerReservaciones, obtenerMisReservaciones } from '../controllers/reservaciones.controller.js';
 import { verificarToken } from '../middlewares/auth.middleware.js';
 
 const router = Router();
@@ -58,5 +58,22 @@ router.get('/', obtenerReservaciones);
  */
 // POST /api/reservaciones -> Crear una reservación clientes y admin
 router.post('/', crearReservacion);
+
+/**
+ * @swagger
+ * /api/reservaciones/mis:
+ *   get:
+ *     summary: Obtiene las reservaciones del usuario autenticado (Cliente)
+ *     tags: [Reservaciones]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Lista de las reservaciones del cliente
+ */
+// 2. Conectamos la ruta. Usamos verificarRol si quieres restringirlo solo a clientes, 
+// o lo dejamos abierto para que un admin también pueda ver sus propias reservas.
+router.get('/mis', obtenerMisReservaciones);
+
 
 export default router;
