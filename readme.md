@@ -43,6 +43,6 @@ Sigue estos pasos para levantar el entorno de desarrollo local:
 
 1. **Clonar el repositorio**
    ```bash
-   git clone [https://github.com/TuUsuario/restaurante-api.git](https://github.com/TuUsuario/restaurante-api.git)
+   https://github.com/fernand3217/restaurant-api-swagger-ui.git
    cd restaurante-api
    ```
